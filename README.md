@@ -15,5 +15,5 @@ gcc MPC_SHA256.c -o mpc_proof.out -L/usr/lib64 -lcrypto -lomp -w
 
 Compile the verifier with the command
 ```
-gcc MPC_SHA256.c -o mpc_proof.out -L/usr/lib64 -lcrypto -lomp -w
+gcc MPC_SHA256.c -o mpc_verify.out -L/usr/lib64 -lcrypto -lomp -w
 ```
