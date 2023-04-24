@@ -746,7 +746,7 @@ int main(void) {
 	printf("Writing file: %ju\n", (uintmax_t)inMilliWrite);
 	printf("Total: %d\n",inMilli);
 	printf("\n");
-	printf("Proof output to file %s", outputFile);
+	printf("Proof output to file %s\n", outputFile);
 
 
 
