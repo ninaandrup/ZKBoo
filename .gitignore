@@ -1,0 +1,5 @@
+# Compiled c files.
+.out
+
+# Output from mpc.
+.bin
