@@ -28,11 +28,15 @@ void printbits(uint32_t n) {
 
 
 int main(void) {
+
+	bool first = true;
+
+	for (int j = 0; j < 1000 ; j ++) {
 	setbuf(stdout, NULL);
 	init_EVP();
 	openmp_thread_setup();
 	
-	printf("Iterations of SHA: %d\n", NUM_ROUNDS);
+	//printf("Iterations of SHA: %d\n", NUM_ROUNDS);
 
 	clock_t begin = clock(), delta, deltaFiles;
 	
@@ -53,15 +57,15 @@ int main(void) {
 
 	uint32_t y[8];
 	reconstruct(as[0].yp[0],as[0].yp[1],as[0].yp[2],y);
-	printf("Proof for hash: ");
-	for(int i=0;i<8;i++) {
-		printf("%02X", y[i]);
-	}
-	printf("\n");
+	//printf("Proof for hash: ");
+	//for(int i=0;i<8;i++) {
+	//	printf("%02X", y[i]);
+	//}
+	//printf("\n");
 
 	deltaFiles = clock() - begin;
 	int inMilliFiles = deltaFiles * 1000 / CLOCKS_PER_SEC;
-	printf("Loading files: %ju\n", (uintmax_t)inMilliFiles);
+	//printf("Loading files: %ju\n", (uintmax_t)inMilliFiles);
 
 
 	clock_t beginE = clock(), deltaE;
@@ -69,7 +73,7 @@ int main(void) {
 	H3(y, as, NUM_ROUNDS, es);
 	deltaE = clock() - beginE;
 	int inMilliE = deltaE * 1000 / CLOCKS_PER_SEC;
-	printf("Generating E: %ju\n", (uintmax_t)inMilliE);
+	//printf("Generating E: %ju\n", (uintmax_t)inMilliE);
 
 
 	clock_t beginV = clock(), deltaV;
@@ -82,18 +86,25 @@ int main(void) {
 	}
 	deltaV = clock() - beginV;
 	int inMilliV = deltaV * 1000 / CLOCKS_PER_SEC;
-	printf("Verifying: %ju\n", (uintmax_t)inMilliV);
+	//printf("Verifying: %ju\n", (uintmax_t)inMilliV);
 	
 	
 	delta = clock() - begin;
 	int inMilli = delta * 1000 / CLOCKS_PER_SEC;
 
-	printf("Total time: %ju\n", (uintmax_t)inMilli);
+	//printf("Total time: %ju\n", (uintmax_t)inMilli);
 	
-
+	if (first) {
+		first = false;
+	} else {
+		printf(", ");
+	}
+	printf("%ju", (uintmax_t)inMilli);
 
 
 	openmp_thread_cleanup();
 	cleanup_EVP();
+	}
+	printf("\n");
 	return EXIT_SUCCESS;
 }
