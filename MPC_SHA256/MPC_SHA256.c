@@ -558,7 +558,14 @@ z prove(int e, unsigned char keys[3][16], unsigned char rs[3][4], View views[3])
 
 
 
-extern int main(void) {
+int main(int argc, char *argv[]) {
+	// Set number of threads
+	if (argc >= 2) {
+	    int threads = atoi(argv[1]);
+	    omp_set_num_threads(threads);
+	    printf("Running with %d threads\n", threads);
+	}
+
 	setbuf(stdout, NULL);
 	srand((unsigned) time(NULL));
 	init_EVP();
