@@ -14,7 +14,7 @@
 #include <openssl/evp.h>
 #include <openssl/err.h>
 #ifdef _WIN32
-#include <openssl/applink.c>
+//#include <openssl/applink.c>
 #endif
 #include <openssl/rand.h>
 #include "omp.h"
@@ -80,7 +80,7 @@ void getAllRandomness(unsigned char key[16], unsigned char randomness[2912]) {
 
 	const unsigned char *iv = (const unsigned char *)"01234567890123456";
 
-	if(1 != EVP_EncryptInit_ex2(ctx, EVP_aes_128_ctr(), key, iv, NULL))
+	if(1 != EVP_EncryptInit_ex(ctx, EVP_aes_128_ctr(), NULL, key, iv))
 		handleErrors();
 
 	unsigned char *plaintext =
