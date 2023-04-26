@@ -558,7 +558,14 @@ z prove(int e, unsigned char keys[3][16], unsigned char rs[3][4], View views[3])
 
 
 
-int main(void) {
+int main(int argc, char *argv[]) {
+	// Set number of threads
+	if (argc >= 2) {
+	    int threads = atoi(argv[1]);
+	    omp_set_num_threads(threads);
+	    printf("Running with %d threads\n", threads);
+	}
+
 	setbuf(stdout, NULL);
 	srand((unsigned) time(NULL));
 	init_EVP();
@@ -571,14 +578,15 @@ int main(void) {
 		return 0;
 	}
 	
-	printf("Enter the string to be hashed (Max 55 characters): ");
-	char userInput[55]; //55 is max length as we only support 447 bits = 55.875 bytes
-	fgets(userInput, sizeof(userInput), stdin);
+	//printf("Enter the string to be hashed (Max 55 characters): ");
+	//char userInput[55]; //55 is max length as we only support 447 bits = 55.875 bytes
+	//fgets(userInput, sizeof(userInput), stdin);
+	char userInput[55] = "Jeg hedder Christian :-)";
 	
 	int i = strlen(userInput)-1; 
-	printf("String length: %d\n", i);
+	//printf("String length: %d\n", i);
 	
-	printf("Iterations of SHA: %d\n", NUM_ROUNDS);
+	//printf("Iterations of SHA: %d\n", NUM_ROUNDS);
 
 
 
@@ -648,17 +656,31 @@ int main(void) {
 	totalRandom = inMilli;
 
 	//Running MPC-SHA2
-	clock_t beginSha = clock(), deltaSha;
-	#pragma omp parallel for
-	for(int k=0; k<NUM_ROUNDS; k++) {
-		as[k] = commit(i, shares[k], randomness[k], rs[k], localViews[k]);
-		for(int j=0; j<3; j++) {
-			free(randomness[k][j]);
+	bool first = true;
+
+	for (int j = 0; j < 1000; j ++) {
+		if (first) {
+			first = false;
+		} else {
+			printf(", ");
 		}
+
+		clock_t beginSha = clock(), deltaSha;
+		#pragma omp parallel for
+		for(int k=0; k<NUM_ROUNDS; k++) {
+			as[k] = commit(i, shares[k], randomness[k], rs[k], localViews[k]);
+			if (j == 999) {
+				for(int j=0; j<3; j++) {
+					free(randomness[k][j]);
+				}
+			}
+		}
+		deltaSha = clock() - beginSha;
+		inMilli = deltaSha * 1000 / CLOCKS_PER_SEC;
+		totalSha = inMilli;
+		printf("%ju", (uintmax_t) totalSha);
 	}
-	deltaSha = clock() - beginSha;
-	inMilli = deltaSha * 1000 / CLOCKS_PER_SEC;
-	totalSha = inMilli;
+	printf("\n");
 	
 	//Committing
 	clock_t beginHash = clock(), deltaHash;
@@ -729,25 +751,24 @@ int main(void) {
 
 	int sumOfParts = 0;
 
-	printf("Generating A: %ju\n", (uintmax_t)inMilliA);
-	printf("	Generating keys: %ju\n", (uintmax_t)totalCrypto);
+	//printf("Generating A: %ju\n", (uintmax_t)inMilliA);
+	//printf("	Generating keys: %ju\n", (uintmax_t)totalCrypto);
 	sumOfParts += totalCrypto;
-	printf("	Generating randomness: %ju\n", (uintmax_t)totalRandom);
+	//printf("	Generating randomness: %ju\n", (uintmax_t)totalRandom);
 	sumOfParts += totalRandom;
-	printf("	Sharing secrets: %ju\n", (uintmax_t)totalSS);
+	//printf("	Sharing secrets: %ju\n", (uintmax_t)totalSS);
 	sumOfParts += totalSS;
-	printf("	Running MPC-SHA2: %ju\n", (uintmax_t)totalSha);
+	//printf("	Running MPC-SHA2: %ju\n", (uintmax_t)totalSha);
 	sumOfParts += totalSha;
-	printf("	Committing: %ju\n", (uintmax_t)totalHash);
+	//printf("	Committing: %ju\n", (uintmax_t)totalHash);
 	sumOfParts += totalHash;
-	printf("	*Accounted for*: %ju\n", (uintmax_t)sumOfParts);
-	printf("Generating E: %ju\n", (uintmax_t)inMilliE);
-	printf("Packing Z: %ju\n", (uintmax_t)inMilliZ);
-	printf("Writing file: %ju\n", (uintmax_t)inMilliWrite);
-	printf("Total: %d\n",inMilli);
-	printf("\n");
-	printf("Proof output to file %s\n", outputFile);
-
+	//printf("	*Accounted for*: %ju\n", (uintmax_t)sumOfParts);
+	//printf("Generating E: %ju\n", (uintmax_t)inMilliE);
+	//printf("Packing Z: %ju\n", (uintmax_t)inMilliZ);
+	//printf("Writing file: %ju\n", (uintmax_t)inMilliWrite);
+	//printf("Total: %d\n",inMilli);
+	//printf("\n");
+	//printf("Proof output to file %s\n", outputFile);
 
 
 	openmp_thread_cleanup();
