@@ -6,3 +6,6 @@
 
 # Timed runs
 *.txt
+
+# Parser output
+*.csv
