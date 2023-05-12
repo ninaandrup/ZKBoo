@@ -1,6 +1,6 @@
 import argparse
 import os
-import pandas as pd  
+import pandas
 
 def process_args() -> str:
     parser = argparse.ArgumentParser("Parser for ZKBoo raw proof and verify times.")
@@ -50,6 +50,6 @@ if __name__ == '__main__':
         verify_times = get_times(verify_path, 'Total time: ')
 
     to_write = {'Proof': proof_times, 'Verify': verify_times}
-    df = pd.DataFrame(to_write) 
+    df = pandas.DataFrame(to_write) 
     df.to_csv(output_path) 
 
