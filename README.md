@@ -18,6 +18,18 @@ Compile the verifier with the command
 gcc MPC_SHA256.c -o mpc_verify.out -L/usr/lib64 -lcrypto -lomp -w
 ```
 
+## Usage (Windows)
+
+Compile the prover with the command
+```
+gcc MPC_SHA256.c -o mpc_proof.out -L/usr/lib64 -lcrypto -fopenmp -w
+```
+
+Compile the verifier with the command
+```
+gcc MPC_SHA256.c -o mpc_verify.out -L/usr/lib64 -lcrypto -fopenmp -w
+```
+
 ## Requirements
 
 Requires `libomp` which can be installed under package name `libomp-devel` on Fedora.
