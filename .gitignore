@@ -3,3 +3,6 @@
 
 # Output from mpc.
 *.bin
+
+# Timed runs
+*.txt
