@@ -1,6 +1,6 @@
 import argparse
 import os
-import csv
+import pandas as pd  
 
 def process_args() -> str:
     parser = argparse.ArgumentParser("Parser for ZKBoo raw proof and verify times.")
@@ -18,8 +18,9 @@ def process_args() -> str:
     curr_path   = os.getcwd()
     proof_path  = None if proof_file  == None else os.path.join(curr_path, proof_file)
     verify_path = None if verify_file == None else os.path.join(curr_path, verify_file)
-    
-    return (proof_path, verify_path)
+    output_path =                                  os.path.join(curr_path, args.output)
+
+    return (proof_path, verify_path, output_path)
 
 def get_times(path: str, match: str) -> list[int]:
     proof_file = open(path)
@@ -37,24 +38,18 @@ def get_times(path: str, match: str) -> list[int]:
     return times
 
 if __name__ == '__main__':
-    (proof_path, verify_path) = process_args()
+    (proof_path, verify_path, output_path) = process_args()
     
-    fields = ['Proof', 'Verify']
-
-    rows = [[], []]
+    proof_times  = []
+    verify_times = []
     
     if proof_path != None:
-        times = get_times(proof_path, 'Total: ')
-        rows[0] = times
+        proof_times = get_times(proof_path, 'Total: ')
 
     if verify_path != None:
-        times = get_times(verify_path, 'Total time: ')
-        rows[1] = times
+        verify_times = get_times(verify_path, 'Total time: ')
 
-
-    with open('GFG', 'w') as f:
-        write = csv.writer(f)
-        
-        write.writerow(fields)
-        write.writerows(rows)
+    to_write = {'Proof': proof_times, 'Verify': verify_times}
+    df = pd.DataFrame(to_write) 
+    df.to_csv(output_path) 
 
