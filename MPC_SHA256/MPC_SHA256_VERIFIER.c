@@ -27,7 +27,14 @@ void printbits(uint32_t n) {
 
 
 
-int main(void) {
+int main(int argc, char *argv[]) {
+	// Set number of threads
+	if (argc >= 2) {
+	    int threads = atoi(argv[1]);
+	    omp_set_num_threads(threads);
+	    printf("Running with %d threads\n", threads);
+	}
+
 	setbuf(stdout, NULL);
 	init_EVP();
 	openmp_thread_setup();
