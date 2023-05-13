@@ -30,6 +30,8 @@ Compile the verifier with the command
 gcc MPC_SHA256.c -o mpc_verify.out -L/usr/lib64 -lcrypto -fopenmp -w
 ```
 
+Or use the bash script `benchmark-win.sh` from a "Git Bash"-terminal.
+
 ## Requirements
 
 Requires `libomp` which can be installed under package name `libomp-devel` on Fedora.
