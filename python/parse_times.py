@@ -20,6 +20,15 @@ def process_args() -> str:
     verify_path = None if verify_file == None else os.path.join(curr_path, verify_file)
     output_path =                                  os.path.join(curr_path, args.output)
 
+    if proof_path[-4:] != '.txt':
+        raise Exception("Proof file have to be a .txt-file.")
+    
+    if verify_path[-4:] != '.txt':
+        raise Exception("Verify file have to be a .txt-file.")
+
+    if output_path[-4:] != '.csv':
+        raise Exception("Output file have to be a .csv-file.")
+
     return (proof_path, verify_path, output_path)
 
 def get_times(path: str, match: str) -> list[int]:
