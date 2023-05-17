@@ -3,8 +3,8 @@
 echo "Enter number of threads."
 read threads
 
-gcc MPC_SHA256.c -o mpc_proof -L/usr/lib64 -lcrypto -fopenmp -w
-gcc MPC_SHA256_VERIFIER.c -o mpc_verify -L/usr/lib64 -lcrypto -fopenmp -w
+gcc MPC_SHA256.c -o mpc_proof -lcrypto -fopenmp -w
+gcc MPC_SHA256_VERIFIER.c -o mpc_verify -lcrypto -fopenmp -w
 
 for n in {1..1000};
 do
