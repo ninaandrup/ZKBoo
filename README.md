@@ -63,7 +63,7 @@ Then run the script for `Windows`
 ```
 This will prompt the user to specify the number of threads to use.
 
-When the script is done, the user can use the python script `python/parse_times.py` to process the output times from the script into a `csv`-file. The script should can be run like this:
+When the script is done, the user can use the python script `python/parse_times.py` to process the output times from the script into a `csv`-file. The script can be run like this:
 
 ```
 python3 python/parse_times.py -p MPC_SHA256/proof_times.txt -v MPC_SHA256/verify_times.txt
