@@ -594,7 +594,7 @@ int main(int argc, char *argv[]) {
 		input[j] = userInput[j];
 	}
 
-	clock_t begin = clock(), delta, deltaA;
+	double begin = omp_get_wtime();
 	unsigned char rs[NUM_ROUNDS][3][4];
 	unsigned char keys[NUM_ROUNDS][3][16];
 	a as[NUM_ROUNDS];
@@ -602,7 +602,7 @@ int main(int argc, char *argv[]) {
 	int totalCrypto = 0;
 	
 	//Generating keys
-	clock_t beginCrypto = clock(), deltaCrypto;
+	double beginCrypto = omp_get_wtime();
 	if(RAND_bytes(keys, NUM_ROUNDS*3*16) != 1) {
 		printf("RAND_bytes failed crypto, aborting\n");
 		return 0;
@@ -611,8 +611,8 @@ int main(int argc, char *argv[]) {
 		printf("RAND_bytes failed crypto, aborting\n");
 		return 0;
 	}
-	deltaCrypto = clock() - beginCrypto;
-	int inMilliCrypto = deltaCrypto * 1000 / CLOCKS_PER_SEC;
+	double deltaCrypto = omp_get_wtime() - beginCrypto;
+	int inMilliCrypto = deltaCrypto * 1000;
 	totalCrypto = inMilliCrypto;
 	
 
@@ -621,7 +621,7 @@ int main(int argc, char *argv[]) {
 
 
 	//Sharing secrets
-	clock_t beginSS = clock(), deltaSS;
+	double beginSS = omp_get_wtime();
 	unsigned char shares[NUM_ROUNDS][3][i];
 	if(RAND_bytes(shares, NUM_ROUNDS*3*i) != 1) {
 		printf("RAND_bytes failed crypto, aborting\n");
@@ -635,12 +635,12 @@ int main(int argc, char *argv[]) {
 		}
 
 	}
-	deltaSS = clock() - beginSS;
-	int inMilli = deltaSS * 1000 / CLOCKS_PER_SEC;
+	double deltaSS = omp_get_wtime() - beginSS;
+	int inMilli = deltaSS * 1000;
 	totalSS = inMilli;
 
 	//Generating randomness
-	clock_t beginRandom = clock(), deltaRandom;
+	double beginRandom = omp_get_wtime();
 	unsigned char *randomness[NUM_ROUNDS][3];
 	#pragma omp parallel for
 	for(int k=0; k<NUM_ROUNDS; k++) {
@@ -650,12 +650,12 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	deltaRandom = clock() - beginRandom;
-	inMilli = deltaRandom * 1000 / CLOCKS_PER_SEC;
+	double deltaRandom = omp_get_wtime() - beginRandom;
+	inMilli = deltaRandom * 1000;
 	totalRandom = inMilli;
 
 	//Running MPC-SHA2
-	clock_t beginSha = clock(), deltaSha;
+	double beginSha = omp_get_wtime();
 	#pragma omp parallel for
 	for(int k=0; k<NUM_ROUNDS; k++) {
 		as[k] = commit(i, shares[k], randomness[k], rs[k], localViews[k]);
@@ -663,12 +663,12 @@ int main(int argc, char *argv[]) {
 			free(randomness[k][j]);
 		}
 	}
-	deltaSha = clock() - beginSha;
-	inMilli = deltaSha * 1000 / CLOCKS_PER_SEC;
+	double deltaSha = omp_get_wtime() - beginSha;
+	inMilli = deltaSha * 1000;
 	totalSha = inMilli;
 	
 	//Committing
-	clock_t beginHash = clock(), deltaHash;
+	double beginHash = omp_get_wtime();
 	#pragma omp parallel for
 	for(int k=0; k<NUM_ROUNDS; k++) {
 		unsigned char hash1[SHA256_DIGEST_LENGTH];
@@ -679,39 +679,39 @@ int main(int argc, char *argv[]) {
 		H(keys[k][2], localViews[k][2], rs[k][2], &hash1);
 		memcpy(as[k].h[2], &hash1, 32);
 	}
-	deltaHash = clock() - beginHash;
-				inMilli = deltaHash * 1000 / CLOCKS_PER_SEC;
-				totalHash += inMilli;
+	double deltaHash = omp_get_wtime() - beginHash;
+	inMilli = deltaHash * 1000;
+	totalHash += inMilli;
 				
-	deltaA = clock() - begin;
-	int inMilliA = deltaA * 1000 / CLOCKS_PER_SEC;
+	double deltaA = omp_get_wtime() - begin;
+	int inMilliA = deltaA * 1000;
 
 	//Generating E
-	clock_t beginE = clock(), deltaE;
+	double beginE = omp_get_wtime();
 	int es[NUM_ROUNDS];
 	uint32_t finalHash[8];
 	for (int j = 0; j < 8; j++) {
 		finalHash[j] = as[0].yp[0][j]^as[0].yp[1][j]^as[0].yp[2][j];
 	}
 	H3(finalHash, as, NUM_ROUNDS, es);
-	deltaE = clock() - beginE;
-	int inMilliE = deltaE * 1000 / CLOCKS_PER_SEC;
+	double deltaE = omp_get_wtime() - beginE;
+	int inMilliE = deltaE * 1000;
 
 
 	//Packing Z
-	clock_t beginZ = clock(), deltaZ;
+	double beginZ = omp_get_wtime();
 	z* zs = malloc(sizeof(z)*NUM_ROUNDS);
 
 	#pragma omp parallel for
 	for(int i = 0; i<NUM_ROUNDS; i++) {
 		zs[i] = prove(es[i],keys[i],rs[i], localViews[i]);
 	}
-	deltaZ = clock() - beginZ;
-	int inMilliZ = deltaZ * 1000 / CLOCKS_PER_SEC;
+	double deltaZ = omp_get_wtime() - beginZ;
+	int inMilliZ = deltaZ * 1000;
 	
 	
 	//Writing to file
-	clock_t beginWrite = clock();
+	double beginWrite = omp_get_wtime();
 	FILE *file;
 
 	char outputFile[3*sizeof(int) + 8];
@@ -726,13 +726,13 @@ int main(int argc, char *argv[]) {
 
 	fclose(file);
 
-	clock_t deltaWrite = clock()-beginWrite;
+	double deltaWrite = omp_get_wtime()-beginWrite;
 	free(zs);
-	int inMilliWrite = deltaWrite * 1000 / CLOCKS_PER_SEC;
+	int inMilliWrite = deltaWrite * 1000;
 
 
-	delta = clock() - begin;
-	inMilli = delta * 1000 / CLOCKS_PER_SEC;
+	double delta = omp_get_wtime() - begin;
+	inMilli = delta * 1000;
 
 	int sumOfParts = 0;
 
