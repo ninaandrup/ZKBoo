@@ -41,7 +41,8 @@ int main(int argc, char *argv[]) {
 	
 	printf("Iterations of SHA: %d\n", NUM_ROUNDS);
 
-	clock_t begin = clock(), delta, deltaFiles;
+	double begin, delta, deltaFiles;
+	begin = omp_get_wtime();
 	
 	a as[NUM_ROUNDS];
 	z zs[NUM_ROUNDS];
@@ -66,20 +67,21 @@ int main(int argc, char *argv[]) {
 	}
 	printf("\n");
 
-	deltaFiles = clock() - begin;
-	int inMilliFiles = deltaFiles * 1000 / CLOCKS_PER_SEC;
+	deltaFiles = omp_get_wtime() - begin;
+	int inMilliFiles = deltaFiles * 1000;
 	printf("Loading files: %ju\n", (uintmax_t)inMilliFiles);
 
 
-	clock_t beginE = clock(), deltaE;
+	double beginE, deltaE;
+	beginE = omp_get_wtime();
 	int es[NUM_ROUNDS];
 	H3(y, as, NUM_ROUNDS, es);
-	deltaE = clock() - beginE;
-	int inMilliE = deltaE * 1000 / CLOCKS_PER_SEC;
+	deltaE = omp_get_wtime() - beginE;
+	int inMilliE = deltaE * 1000;
 	printf("Generating E: %ju\n", (uintmax_t)inMilliE);
 
-
-	clock_t beginV = clock(), deltaV;
+	double beginV, deltaV;
+	beginV = omp_get_wtime();
 	#pragma omp parallel for
 	for(int i = 0; i<NUM_ROUNDS; i++) {
 		int verifyResult = verify(as[i], es[i], zs[i]);
@@ -87,13 +89,13 @@ int main(int argc, char *argv[]) {
 			printf("Not Verified %d\n", i);
 		}
 	}
-	deltaV = clock() - beginV;
-	int inMilliV = deltaV * 1000 / CLOCKS_PER_SEC;
+	deltaV = omp_get_wtime() - beginV;
+	int inMilliV = deltaV * 1000;
 	printf("Verifying: %ju\n", (uintmax_t)inMilliV);
 	
 	
-	delta = clock() - begin;
-	int inMilli = delta * 1000 / CLOCKS_PER_SEC;
+	delta = omp_get_wtime() - begin;
+	int inMilli = delta * 1000;
 
 	printf("Total time: %ju\n", (uintmax_t)inMilli);
 	

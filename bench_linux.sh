@@ -3,9 +3,7 @@
 echo "Enter max number of threads."
 read THREADS
 
-START=1
-
-for ((n=$START; n<$THREADS; n++))
+for ((n=1; n<=$THREADS; n++))
 do
     echo "Running for $n threads"
     cd MPC_SHA256
