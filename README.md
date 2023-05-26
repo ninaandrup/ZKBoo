@@ -26,9 +26,9 @@ The following script will run 1000 benchmarks
 ```
 bench_linux.sh
 ```
-The user should specify the number of threads to use. *The thread support for Linux is not guarenteed working properly.*
+The user should specify the number of maximum threads to use.
 
-The script will output a file `out.csv` with the prover and verifier times for each run.
+The script will output files `threads-[#].csv` with the prover and verifier times for each run.
 
 ## Usage (Windows)
 
